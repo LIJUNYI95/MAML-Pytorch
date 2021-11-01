@@ -26,4 +26,4 @@ conda activate /ocean/projects/cis210085p/ganjdane/Junyi/Pytorch
 
 #run pre-compiled program which is already in your project space
 
-python omniglot_train.py --n_way 5 --k_spt 5
+python omniglot_train.py --n_way 20 --k_spt 1
