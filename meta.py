@@ -146,7 +146,7 @@ class Meta(nn.Module):
         self.meta_optim.zero_grad()
         grad = torch.autograd.grad(fast_weights, self.net.parameters(), grad_outputs=grad_q)
         for p, g in zip(self.net.parameters(), grad):
-            p.grad = g
+            p.grad = g.clone()
         # loss_q.backward()
         self.meta_optim.step()
 

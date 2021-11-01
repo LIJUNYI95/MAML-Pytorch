@@ -12,8 +12,8 @@ def main(args):
     np.random.seed(222)
     save_dir = os.environ['PROJECT']
     print(args)
-    prefix = save_dir + '/results/beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
-    save_path = save_dir + '/models/beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
+    prefix = save_dir + '/Junyi/MAML/results/beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
+    save_path = save_dir + '/Junyi/MAML/models/beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
     config = [
         ('conv2d', [64, 1, 3, 3, 2, 0]),
         ('relu', [True]),
