@@ -9,7 +9,6 @@
 #this job would potentially charge 20 GPU SUs
 
 #echo commands to stdout
-set -x
 
 # move to working directory
 # this job assumes:
