@@ -26,4 +26,4 @@ conda activate $PROJECT/pytorch
 
 #run pre-compiled program which is already in your project space
 
-python omniglot_train.py --n_way 20 --k_spt 5 --m_coef 0.7 --restore
+python omniglot_train.py --n_way 20 --k_spt 5 --m_coef 0.7 --mu 0.9
