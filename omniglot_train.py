@@ -44,9 +44,9 @@ def main(args):
     
     if args.restore:
         train_loss = list(np.load(prefix +'train_loss.npy'))
-        train_acc = list(np.save(prefix +'train_acc.npy'))
-        val_loss = list(np.save(prefix +'val_loss.npy'))
-        val_acc = list(np.save(prefix +'val_acc.npy'))
+        train_acc = list(np.load(prefix +'train_acc.npy'))
+        val_loss = list(np.load(prefix +'val_loss.npy'))
+        val_acc = list(np.load(prefix +'val_acc.npy'))
     else:
         train_acc =[]; val_acc = []; train_loss = []; val_loss = []
 
