@@ -12,8 +12,8 @@ def main(args):
     np.random.seed(222)
     save_dir = os.environ['PROJECT']
     print(args)
-    prefix = save_dir + '/Junyi/MAML/results/beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
-    save_path = save_dir + '/Junyi/MAML/models/beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
+    prefix = save_dir + '/junyili/MAML/results/beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
+    save_path = save_dir + '/junyili/MAML/models/beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
     config = [
         ('conv2d', [64, 1, 3, 3, 2, 0]),
         ('relu', [True]),
@@ -42,7 +42,14 @@ def main(args):
     print(maml)
     print('Total trainable tensors:', num)
     
-    train_acc =[]; val_acc = []; train_loss = []; val_loss = []
+    if args.restore:
+        train_loss = list(np.load(prefix +'train_loss.npy'))
+        train_acc = list(np.save(prefix +'train_acc.npy'))
+        val_loss = list(np.save(prefix +'val_loss.npy'))
+        val_acc = list(np.save(prefix +'val_acc.npy'))
+    else:
+        train_acc =[]; val_acc = []; train_loss = []; val_loss = []
+
 
     db_train = OmniglotNShot('omniglot',
                        batchsz=args.task_num,
@@ -51,7 +58,7 @@ def main(args):
                        k_query=args.k_qry,
                        imgsz=args.imgsz)
 
-    for step in range(args.epoch):
+    for step in range(len(train_acc), args.epoch):
 
         x_spt, y_spt, x_qry, y_qry = db_train.next()
         x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).to(device), \
@@ -98,7 +105,7 @@ def main(args):
 if __name__ == '__main__':
 
     argparser = argparse.ArgumentParser()
-    argparser.add_argument('--epoch', type=int, help='epoch number', default=400000)
+    argparser.add_argument('--epoch', type=int, help='epoch number', default=500000)
     argparser.add_argument('--n_way', type=int, help='n way', default=5)
     argparser.add_argument('--k_spt', type=int, help='k shot for support set', default=1)
     argparser.add_argument('--k_qry', type=int, help='k shot for query set', default=15)
