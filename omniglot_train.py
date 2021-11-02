@@ -3,7 +3,7 @@ import  numpy as np
 from    omniglotNShot import OmniglotNShot
 import  argparse
 
-from    meta import Meta
+from   meta import Meta
 
 def main(args):
 
