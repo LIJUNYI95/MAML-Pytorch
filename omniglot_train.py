@@ -12,8 +12,8 @@ def main(args):
     np.random.seed(222)
     save_dir = os.environ['PROJECT']
     print(args)
-    prefix = save_dir + '/MAML/results/beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
-    save_path = save_dir + '/MAML/models/beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
+    prefix = save_dir + '/MAML/results/beta_'+ str(args.m_coef) + '_mu_' + str(args.mu) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
+    save_path = save_dir + '/MAML/models/beta_'+ str(args.m_coef) + '_mu_' + str(args.mu) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
     config = [
         ('conv2d', [64, 1, 3, 3, 2, 0]),
         ('relu', [True]),
@@ -114,6 +114,7 @@ if __name__ == '__main__':
     argparser.add_argument('--task_num', type=int, help='meta batch size, namely task num', default=32)
     argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=1e-3)
     argparser.add_argument('--m_coef', type=float, help='momentum coefficient for SCGD', default=1)
+    argparser.add_argument('--mu', type=float, help='momentum coefficient for SCGD outer update', default=0)
     argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.4)
     argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=2)
     argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=2)

@@ -28,6 +28,7 @@ class Meta(nn.Module):
         self.n_way = args.n_way
         self.k_spt = args.k_spt
         self.k_qry = args.k_qry
+        self.mu = args.mu
         self.task_num = args.task_num
         self.update_step = args.update_step
         self.update_step_test = args.update_step_test
@@ -35,7 +36,10 @@ class Meta(nn.Module):
 
         self.net = Learner(config, args.imgc, args.imgsz)
         self.momentum_weight = None
-        self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
+        if self.mu > 0:
+            self.meta_optim = optim.SGD(self.net.parameters(), lr=self.meta_lr, momentum=self.mu)
+        else:
+            self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
 
     def clip_grad_by_norm_(self, grad, max_norm):
         """
