@@ -31,18 +31,17 @@ class OmniglotNShot:
                                                             lambda x: x/255.])
                               )
 
-            pdb.set_trace()
             temp = dict()  # {label:img1, img2..., 20 imgs, label2: img1, img2,... in total, 1623 label}
             for (img, label) in self.x:
                 if label in temp.keys():
                     temp[label].append(img)
                 else:
                     temp[label] = [img]
-
+            pdb.set_trace()
             self.x = []
             for label, imgs in temp.items():  # labels info deserted , each label contains 20imgs
                 self.x.append(np.array(imgs))
-
+            pdb.set_trace()
             # as different class may have different number of imgs
             self.x = np.array(self.x).astype(np.float)  # [[20 imgs],..., 1623 classes in total]
             # each character contains 20 imgs
