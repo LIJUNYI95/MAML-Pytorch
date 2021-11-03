@@ -122,6 +122,8 @@ def main(args):
             np.save(prefix +'val_acc.npy', val_acc)
 
         step += 1
+        if step > args.epoch:
+            break
 
 if __name__ == '__main__':
 
