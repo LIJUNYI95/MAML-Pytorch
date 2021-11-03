@@ -2,7 +2,7 @@ import  torch, os
 import  numpy as np
 from    omniglotNShot import OmniglotNShot
 import  argparse
-
+import pdb
 from   meta import Meta
 
 def main(args):
@@ -62,11 +62,17 @@ def main(args):
                        k_query=args.k_qry,
                        imgsz=args.imgsz)
 
-    for step in range(len(train_acc), args.epoch):
+    step = len(train_acc)
+    # for step in range(len(train_acc), args.epoch):
+    for batch in db_train.dataloader:
+        x_spt, y_spt = batch['train']
+        x_qry, y_qry = batch['test']
 
-        x_spt, y_spt, x_qry, y_qry = db_train.next()
-        x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).to(device), \
-                                     torch.from_numpy(x_qry).to(device), torch.from_numpy(y_qry).to(device)
+        pdb.set_trace()
+        # x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).to(device), \
+        #                              torch.from_numpy(x_qry).to(device), torch.from_numpy(y_qry).to(device)
+        x_spt, y_spt, x_qry, y_qry = x_spt.to(device), y_spt.to(device), \
+                                     x_qry.to(device), y_qry.to(device)
 
         # set traning=True to update running_mean, running_variance, bn_weights, bn_bias
         accs, losses = maml(x_spt, y_spt, x_qry, y_qry)
@@ -84,16 +90,26 @@ def main(args):
             
         if step % 500 == 0:
             accs = []; losses = []
-            for _ in range(600//args.task_num):
+            test_step = 0
+            # for _ in range(600//args.task_num):
+            for test_batch in db_train.dataloader_val:
                 # test
-                x_spt, y_spt, x_qry, y_qry = db_train.next('test')
-                x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).to(device), \
-                                             torch.from_numpy(x_qry).to(device), torch.from_numpy(y_qry).to(device)
+                # x_spt, y_spt, x_qry, y_qry = db_train.next('test')
+                # x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).to(device), \
+                #                              torch.from_numpy(x_qry).to(device), torch.from_numpy(y_qry).to(device)
+
+                x_spt, y_spt = test_batch['train']
+                x_qry, y_qry = test_batch['test']
+                x_spt, y_spt, x_qry, y_qry = x_spt.to(device), y_spt.to(device), x_qry.to(device), y_qry.to(device)
 
                 # split to single task each time
                 for x_spt_one, y_spt_one, x_qry_one, y_qry_one in zip(x_spt, y_spt, x_qry, y_qry):
                     test_acc, test_loss = maml.finetunning(x_spt_one, y_spt_one, x_qry_one, y_qry_one)
                     accs.append(test_acc); losses.append(test_loss)
+                
+                test_step += args.task_num
+                if test_step > 600:
+                    break
 
             # [b, update_step+1]
             accs = np.array(accs).mean(axis=0).astype(np.float16)
@@ -105,6 +121,7 @@ def main(args):
             np.save(prefix +'val_loss.npy', val_loss)
             np.save(prefix +'val_acc.npy', val_acc)
 
+        step += 1
 
 if __name__ == '__main__':
 
