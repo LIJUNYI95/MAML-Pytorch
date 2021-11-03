@@ -68,7 +68,7 @@ def main(args):
         x_spt, y_spt = batch['train']
         x_qry, y_qry = batch['test']
 
-        # pdb.set_trace()
+        pdb.set_trace()
         # x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).to(device), \
         #                              torch.from_numpy(x_qry).to(device), torch.from_numpy(y_qry).to(device)
         x_spt, y_spt, x_qry, y_qry = x_spt.to(device), y_spt.to(device), \
