@@ -4,6 +4,8 @@ from    PIL import Image
 import  os.path
 import  numpy as np
 
+import pdb
+
 
 class OmniglotNShot:
 
@@ -29,6 +31,7 @@ class OmniglotNShot:
                                                             lambda x: x/255.])
                               )
 
+            pdb.set_trace()
             temp = dict()  # {label:img1, img2..., 20 imgs, label2: img1, img2,... in total, 1623 label}
             for (img, label) in self.x:
                 if label in temp.keys():

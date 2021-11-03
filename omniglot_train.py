@@ -84,7 +84,7 @@ def main(args):
             
         if step % 500 == 0:
             accs = []; losses = []
-            for _ in range(1000//args.task_num):
+            for _ in range(600//args.task_num):
                 # test
                 x_spt, y_spt, x_qry, y_qry = db_train.next('test')
                 x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).to(device), \
