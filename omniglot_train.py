@@ -12,12 +12,12 @@ def main(args):
     np.random.seed(222)
     save_dir = os.environ['PROJECT']
     print(args)
-    if args.mu > 0:
-        prefix = save_dir + '/MAML/results/beta_'+ str(args.m_coef) + '_mu_' + str(args.mu) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
-        save_path = save_dir + '/MAML/models/beta_'+ str(args.m_coef) + '_mu_' + str(args.mu) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
-    else:
+    if not args.dimi_m_coef:
         prefix = save_dir + '/MAML/results/beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
         save_path = save_dir + '/MAML/models/beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
+    else:
+        prefix = save_dir + '/MAML/results/beta_dim' + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
+        save_path = save_dir + '/MAML/models/beta_dim' + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
     config = [
         ('conv2d', [64, 1, 3, 3, 2, 0]),
         ('relu', [True]),
@@ -75,6 +75,7 @@ def main(args):
                                      x_qry.to(device), y_qry.to(device)
 
         # set traning=True to update running_mean, running_variance, bn_weights, bn_bias
+        maml.m_coef = 1/(step // 5000 + 1) ** 0.5
         accs, losses = maml(x_spt, y_spt, x_qry, y_qry)
         train_acc.append(accs[-1]); train_loss.append(losses[-1])
 
@@ -141,7 +142,7 @@ if __name__ == '__main__':
     argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.4)
     argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=2)
     argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=2)
-
+    argparser.add_argument('--dimi_m_coef', dest='restore', action='store_true')
     argparser.add_argument('--restore', dest='restore', action='store_true')
 
 
