@@ -142,7 +142,7 @@ if __name__ == '__main__':
     argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.4)
     argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=2)
     argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=2)
-    argparser.add_argument('--dimi_m_coef', dest='restore', action='store_true')
+    argparser.add_argument('--dimi_m_coef', dest='dimi_m_coef', action='store_true')
     argparser.add_argument('--restore', dest='restore', action='store_true')
 
 
