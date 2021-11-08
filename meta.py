@@ -39,7 +39,7 @@ class Meta(nn.Module):
         if self.mu > 0:
             self.meta_optim = optim.SGD(self.net.parameters(), lr=self.meta_lr, momentum=self.mu)
         else:
-            self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
+            self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr, weight_decay=1e-3)
 
     def clip_grad_by_norm_(self, grad, max_norm):
         """
