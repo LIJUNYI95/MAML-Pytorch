@@ -39,7 +39,7 @@ class Meta(nn.Module):
         if self.mu > 0:
             self.meta_optim = optim.SGD(self.net.parameters(), lr=self.meta_lr, momentum=self.mu)
         else:
-            self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr, weight_decay=1e-3)
+            self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
 
     def clip_grad_by_norm_(self, grad, max_norm):
         """
@@ -99,11 +99,16 @@ class Meta(nn.Module):
 
             fast_weights = list(map(lambda p: p, self.net.parameters()))
 
-            for _ in range(self.update_step):
+            for k in range(self.update_step):
                 # 1. run the i-th task and compute loss for k=1~K-1
                 logits = self.net(x_spt[i], fast_weights, bn_training=True)
                 loss = F.cross_entropy(logits, y_spt[i])
                 # 2. compute grad on theta_pi
+                
+                if k == self.update_step - 1:
+                    total_weight = torch.sum([torch.norm(f_p - p.detach().clone())**2 for f_p, p in zip(fast_weights, self.net.parameters())])
+                    loss = loss + 1e-3 * total_weight
+
                 grad = torch.autograd.grad(loss, fast_weights)
                 # 3. theta_pi = theta_pi - train_lr * grad
                 fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, fast_weights)))
