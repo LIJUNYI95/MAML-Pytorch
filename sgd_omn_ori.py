@@ -17,7 +17,7 @@ from collections import defaultdict
 
 
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 log_file = open("log_ori_3.txt","a")
 
 innerT = 10
