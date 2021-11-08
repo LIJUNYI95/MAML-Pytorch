@@ -129,13 +129,13 @@ class META_RES(nn.Module):
 
 
 class INNER(nn.Module):
-    def __init__(self, device=None):
+    def __init__(self):
         super(INNER, self).__init__()
         self.meta = META()
         self.weight = torch.tensor(np.random.normal(size = (batch_size_out, 64, num_class)),\
-            dtype=torch.float).to(device).requires_grad_()
+            dtype=torch.float).cuda().requires_grad_()
         self.bias = torch.tensor(np.random.normal(size = (batch_size_out, 1, num_class)),\
-            dtype=torch.float).to(device).requires_grad_()
+            dtype=torch.float).cuda().requires_grad_()
 
     def forward(self,x):
         #pdb.set_trace()
@@ -149,9 +149,9 @@ class INNER(nn.Module):
         return x
 
 class GHO(nn.Module):
-    def __init__(self, device = None):
+    def __init__(self):
         super(GHO, self).__init__()
-        self.inner = INNER(device)
+        self.inner = INNER()
    
     def forward(self,data):
         x,y = data[0], data[1]
@@ -204,7 +204,7 @@ dataloader_val = BatchMetaDataLoader(dataset_val, shuffle=True, batch_size=batch
 now = time.time()
 # with torch.cuda.device(gpu_num):
 
-gho = GHO(torch.device("cuda:0"))
+gho = GHO()
 gho = gho.cuda()
 
 optimizer_inner = Adam(['w','b'], lr=lr)
