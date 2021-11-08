@@ -202,121 +202,121 @@ dataset_val = ClassSplitter(dataset_val, shuffle=True, num_train_per_class=1, \
 dataloader_val = BatchMetaDataLoader(dataset_val, shuffle=True, batch_size=batch_size_out, num_workers=4)
 
 now = time.time()
-with torch.cuda.device(gpu_num):
+# with torch.cuda.device(gpu_num):
 
-    gho = GHO(torch.device("cuda:0"))
-    gho = gho.cuda()
+gho = GHO(torch.device("cuda:0"))
+gho = gho.cuda()
 
-    optimizer_inner = Adam(['w','b'], lr=lr)
-    optimizer_outer = optim.Adam(gho.inner.meta.parameters(),\
-        lr=hlr, weight_decay=weight_decay)
-    hyper_grad_norm = []
-    val_err = []
-    accuracy = []
+optimizer_inner = Adam(['w','b'], lr=lr)
+optimizer_outer = optim.Adam(gho.inner.meta.parameters(),\
+    lr=hlr, weight_decay=weight_decay)
+hyper_grad_norm = []
+val_err = []
+accuracy = []
 
-    for hyt, data in enumerate(dataloader):
-        if hyt > T:
-            break
-        #evaluation
-        if hyt % 25 == 0:
-            acc_inner = []
-            for hyt_val, data_val in enumerate(dataloader_val):
-                if hyt_val > 100:
-                    break
-                optimizer_inner.state = defaultdict(dict)
-                
-                nn.init.xavier_uniform_(gho.inner.weight)
-                nn.init.uniform_(gho.inner.bias)
-                gho.inner.weight.detach_().requires_grad_()
-                gho.inner.bias.detach_().requires_grad_()
+for hyt, data in enumerate(dataloader):
+    if hyt > T:
+        break
+    #evaluation
+    if hyt % 25 == 0:
+        acc_inner = []
+        for hyt_val, data_val in enumerate(dataloader_val):
+            if hyt_val > 100:
+                break
+            optimizer_inner.state = defaultdict(dict)
+            
+            nn.init.xavier_uniform_(gho.inner.weight)
+            nn.init.uniform_(gho.inner.bias)
+            gho.inner.weight.detach_().requires_grad_()
+            gho.inner.bias.detach_().requires_grad_()
 
-                #pdb.set_trace()
-                x, y = data_val["train"]
-                # x = torch.squeeze(x,dim=0).cuda()
-                # y = torch.squeeze(y).cuda()
-                dX, dY = data_val["test"]
-                index = np.zeros(num_class*15,np.bool_)
-                val_index = np.random.choice(num_class*15,size=10*num_class, replace=False)
-                index[val_index] = np.ones(num_class*10,np.bool_)
-                devX, testX = dX[:,index], dX[:,~index]
-                devY, testY = dY[:,index], dY[:,~index]
-                x = torch.cat((x,devX),dim=1)
-                y = torch.cat((y,devY),dim=1)
-                # devX = torch.squeeze(devX,dim=0).cuda()
-                # devY = torch.squeeze(devY).cuda()
-                x, y = x.cuda(), y.cuda()
-                devX, devY = devX.cuda(), devY.cuda()
-                testX, testY = testX.cuda(), testY.cuda()
-                #pdb.set_trace()
+            #pdb.set_trace()
+            x, y = data_val["train"]
+            # x = torch.squeeze(x,dim=0).cuda()
+            # y = torch.squeeze(y).cuda()
+            dX, dY = data_val["test"]
+            index = np.zeros(num_class*15,np.bool_)
+            val_index = np.random.choice(num_class*15,size=10*num_class, replace=False)
+            index[val_index] = np.ones(num_class*10,np.bool_)
+            devX, testX = dX[:,index], dX[:,~index]
+            devY, testY = dY[:,index], dY[:,~index]
+            x = torch.cat((x,devX),dim=1)
+            y = torch.cat((y,devY),dim=1)
+            # devX = torch.squeeze(devX,dim=0).cuda()
+            # devY = torch.squeeze(devY).cuda()
+            x, y = x.cuda(), y.cuda()
+            devX, devY = devX.cuda(), devY.cuda()
+            testX, testY = testX.cuda(), testY.cuda()
+            #pdb.set_trace()
 
-                new1 = time.time()
-                for epoch in range(innerT_test):
-                    loss = gho((x,y))
+            new1 = time.time()
+            for epoch in range(innerT_test):
+                loss = gho((x,y))
 
-                    new_params = optimizer_inner.step(loss = loss,\
-                        weights = [gho.inner.weight,gho.inner.bias], \
-                            create_graph=True)
-                    gho.inner.weight =gho.inner.weight + new_params[0]
-                    gho.inner.bias =gho.inner.bias + new_params[1]
+                new_params = optimizer_inner.step(loss = loss,\
+                    weights = [gho.inner.weight,gho.inner.bias], \
+                        create_graph=True)
+                gho.inner.weight =gho.inner.weight + new_params[0]
+                gho.inner.bias =gho.inner.bias + new_params[1]
 
-                ans = torch.argmax(gho.inner((testX)).reshape(-1,num_class),-1)
-                acc = torch.mean(ans == testY.reshape(-1),dtype = torch.float)
-                acc_inner.append(acc.data.cpu().numpy())
+            ans = torch.argmax(gho.inner((testX)).reshape(-1,num_class),-1)
+            acc = torch.mean(ans == testY.reshape(-1),dtype = torch.float)
+            acc_inner.append(acc.data.cpu().numpy())
 
-            accuracy.append(np.mean(acc_inner))
-            print("the accuracy is:", accuracy[-1])
+        accuracy.append(np.mean(acc_inner))
+        print("the accuracy is:", accuracy[-1])
 
-        optimizer_inner.state = defaultdict(dict)
-        
-        nn.init.xavier_uniform_(gho.inner.weight)
-        nn.init.uniform_(gho.inner.bias)
-        gho.inner.weight.detach_().requires_grad_()
-        gho.inner.bias.detach_().requires_grad_()
-
-
-        #pdb.set_trace()
-        x, y = data["train"]
-        x, y = x.cuda(), y.cuda()
-        dX, dY = data["test"]
-        index = np.zeros(num_class*15,np.bool_)
-        val_index = np.random.choice(num_class*15,size=10*num_class,replace=False)
-        index[val_index] = np.ones(num_class*10,np.bool_)
-        devX, testX = dX[:,index], dX[:,~index]
-        devY, testY = dY[:,index], dY[:,~index]
-        devX, devY = devX.cuda(), devY.cuda()
-        testX, testY = testX.cuda(), testY.cuda()
-        #pdb.set_trace()
-
-        new1 = time.time()
-        for epoch in range(innerT):
-            loss = gho((x,y))
-
-            print("The training loss at iter", epoch, "is: ", loss.data.cpu().numpy())
-            new_params = optimizer_inner.step(loss = loss,\
-                 weights = [gho.inner.weight,gho.inner.bias], \
-                     create_graph=True)
-            gho.inner.weight =gho.inner.weight + new_params[0]
-            gho.inner.bias =gho.inner.bias + new_params[1]
-        print("training time is: ", time.time() - new1)
-
-        now1 = time.time()
-        ERR = gho((devX,devY))
-        error = torch.norm(ERR).data.cpu().numpy()
-        val_err.append(error)
-        print("The validation Err is:", val_err[-1])
-        optimizer_outer.zero_grad()
-        ERR.backward()
-        optimizer_outer.step()
-        norm = gho.inner.meta.get_grad_norm()
-        hyper_grad_norm.append(norm)
-        print("The norm of the hypergradient is: ", norm)
+    optimizer_inner.state = defaultdict(dict)
+    
+    nn.init.xavier_uniform_(gho.inner.weight)
+    nn.init.uniform_(gho.inner.bias)
+    gho.inner.weight.detach_().requires_grad_()
+    gho.inner.bias.detach_().requires_grad_()
 
 
-        if hyt%1 == 0:
-            print(hyt,':',ERR.data.cpu().numpy(),file=log_file)#,acc.data.cpu().numpy())
-        if hyt%200==0:
-            np.save("grad_norm/meta_sgd_omni_grad_norm_1_5_4_10", hyper_grad_norm) 
-            np.save("grad_norm/meta_sgd_omni_val_err_1_5_4_10", val_err)
-            np.save("grad_norm/meta_sgd_omni_acc_1_5_4_10", accuracy) 
-    print("running time is: %.3f", time.time() - now)
+    #pdb.set_trace()
+    x, y = data["train"]
+    x, y = x.cuda(), y.cuda()
+    dX, dY = data["test"]
+    index = np.zeros(num_class*15,np.bool_)
+    val_index = np.random.choice(num_class*15,size=10*num_class,replace=False)
+    index[val_index] = np.ones(num_class*10,np.bool_)
+    devX, testX = dX[:,index], dX[:,~index]
+    devY, testY = dY[:,index], dY[:,~index]
+    devX, devY = devX.cuda(), devY.cuda()
+    testX, testY = testX.cuda(), testY.cuda()
+    #pdb.set_trace()
+
+    new1 = time.time()
+    for epoch in range(innerT):
+        loss = gho((x,y))
+
+        print("The training loss at iter", epoch, "is: ", loss.data.cpu().numpy())
+        new_params = optimizer_inner.step(loss = loss,\
+                weights = [gho.inner.weight,gho.inner.bias], \
+                    create_graph=True)
+        gho.inner.weight =gho.inner.weight + new_params[0]
+        gho.inner.bias =gho.inner.bias + new_params[1]
+    print("training time is: ", time.time() - new1)
+
+    now1 = time.time()
+    ERR = gho((devX,devY))
+    error = torch.norm(ERR).data.cpu().numpy()
+    val_err.append(error)
+    print("The validation Err is:", val_err[-1])
+    optimizer_outer.zero_grad()
+    ERR.backward()
+    optimizer_outer.step()
+    norm = gho.inner.meta.get_grad_norm()
+    hyper_grad_norm.append(norm)
+    print("The norm of the hypergradient is: ", norm)
+
+
+    if hyt%1 == 0:
+        print(hyt,':',ERR.data.cpu().numpy(),file=log_file)#,acc.data.cpu().numpy())
+    if hyt%200==0:
+        np.save("grad_norm/meta_sgd_omni_grad_norm_1_5_4_10", hyper_grad_norm) 
+        np.save("grad_norm/meta_sgd_omni_val_err_1_5_4_10", val_err)
+        np.save("grad_norm/meta_sgd_omni_acc_1_5_4_10", accuracy) 
+print("running time is: %.3f", time.time() - now)
    
