@@ -64,7 +64,7 @@ class OmniglotNShot:
                         download=True)
 
         dataset_val = ClassSplitter(dataset_val, shuffle=True, num_train_per_class=k_shot, \
-            num_test_per_class=k_query)
+            num_test_per_class=1)
         self.dataloader_val = BatchMetaDataLoader(dataset_val, shuffle=True, batch_size=batchsz, num_workers=4)
 
 
