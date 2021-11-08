@@ -106,7 +106,8 @@ class Meta(nn.Module):
                 # 2. compute grad on theta_pi
                 
                 if k == self.update_step - 1:
-                    total_weight = torch.sum(torch.cat([torch.norm(f_p - p.detach().clone())**2 for f_p, p in zip(fast_weights, self.net.parameters())]))
+                    total_weight = torch.sum(torch.cat([torch.norm((f_p - p.detach().clone())**2).view(1,-1) for f_p, p in zip(fast_weights, self.net.parameters())]))
+                    print(total_weight)
                     loss = loss + 1e-3 * total_weight
 
                 grad = torch.autograd.grad(loss, fast_weights)
