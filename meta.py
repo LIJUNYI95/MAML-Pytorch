@@ -119,7 +119,7 @@ class Meta(nn.Module):
                 
 
         logits_q = self.net(x_qry.reshape(task_num*querysz, c_,h, w), u_state, bn_training=True)
-        loss_q = F.cross_entropy(logits_q, y_qry); losses_q[1] += loss_q.detach().clone()
+        loss_q = F.cross_entropy(logits_q, y_qry.reshape(-1)); losses_q[1] += loss_q.detach().clone()
         grad_q = torch.autograd.grad(loss_q, u_state)
 
         with torch.no_grad():
