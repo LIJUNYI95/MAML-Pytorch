@@ -125,7 +125,7 @@ class Meta(nn.Module):
                 tmp_w += cur_w/task_num
 
             for tmp_g, cur_g in zip(tmp_grad, fast_weights):
-                tmp_g += cur_g/task_num 
+                tmp_g = tmp_g + cur_g/task_num 
                  
             with torch.no_grad():
                 pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
