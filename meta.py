@@ -89,7 +89,7 @@ class Meta(nn.Module):
             losses_q[0] += loss_q
 
             pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-            correct = torch.eq(pred_q, y_qry).sum().item()
+            correct = torch.eq(pred_q, y_qry.reshape(-1)).sum().item()
             corrects[0] = corrects[0] + correct
 
 
@@ -98,7 +98,7 @@ class Meta(nn.Module):
         for _ in range(self.update_step):
             # 1. run the i-th task and compute loss for k=1~K-1
             logits = self.net(x_spt.reshape(task_num*setsz, c_,h, w), fast_weights, bn_training=True)
-            loss = F.cross_entropy(logits, y_spt)
+            loss = F.cross_entropy(logits, y_spt.reshape(-1))
             # 2. compute grad on theta_pi
             
             # if k == self.update_step - 1:
@@ -124,7 +124,7 @@ class Meta(nn.Module):
 
         with torch.no_grad():
             pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-            correct = torch.eq(pred_q, y_qry).sum().item()
+            correct = torch.eq(pred_q, y_qry.reshape(-1)).sum().item()
             corrects[1] = corrects[1] + correct
 
         # pdb.set_trace()     
