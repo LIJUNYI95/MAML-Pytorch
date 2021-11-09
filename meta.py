@@ -84,11 +84,11 @@ class Meta(nn.Module):
         # this is the loss and accuracy before first update
         with torch.no_grad():
             # [setsz, nway]
-            logits_q = self.net(x_qry, self.net.parameters(), bn_training=True)
-            loss_q = F.cross_entropy(logits_q.reshape(task_num*querysz,-1), y_qry.reshape(-1))
+            logits_q = self.net(x_qry.reshape(task_num*querysz, c_,h, w), self.net.parameters(), bn_training=True)
+            loss_q = F.cross_entropy(logits_q, y_qry.reshape(-1))
             losses_q[0] += loss_q
 
-            pred_q = F.softmax(logits_q.reshape(task_num*querysz,-1), dim=1).argmax(dim=1)
+            pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
             correct = torch.eq(pred_q, y_qry).sum().item()
             corrects[0] = corrects[0] + correct
 
@@ -97,8 +97,8 @@ class Meta(nn.Module):
 
         for _ in range(self.update_step):
             # 1. run the i-th task and compute loss for k=1~K-1
-            logits = self.net(x_spt, fast_weights, bn_training=True)
-            loss = F.cross_entropy(logits.reshape(task_num*setsz,-1), y_spt)
+            logits = self.net(x_spt.reshape(task_num*setsz, c_,h, w), fast_weights, bn_training=True)
+            loss = F.cross_entropy(logits, y_spt)
             # 2. compute grad on theta_pi
             
             # if k == self.update_step - 1:
@@ -118,12 +118,12 @@ class Meta(nn.Module):
             u_state = [u.detach().clone().requires_grad_() for u in u_state]
                 
 
-        logits_q = self.net(x_qry, u_state, bn_training=True)
-        loss_q = F.cross_entropy(logits_q.reshape(task_num*querysz,-1), y_qry); losses_q[1] += loss_q.detach().clone()
+        logits_q = self.net(x_qry.reshape(task_num*querysz, c_,h, w), u_state, bn_training=True)
+        loss_q = F.cross_entropy(logits_q, y_qry); losses_q[1] += loss_q.detach().clone()
         grad_q = torch.autograd.grad(loss_q, u_state)
 
         with torch.no_grad():
-            pred_q = F.softmax(logits_q.reshape(task_num*querysz,-1), dim=1).argmax(dim=1)
+            pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
             correct = torch.eq(pred_q, y_qry).sum().item()
             corrects[1] = corrects[1] + correct
 
