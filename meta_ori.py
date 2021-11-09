@@ -101,20 +101,14 @@ class Meta(nn.Module):
                 logits = self.net(x_spt[i], fast_weights, bn_training=True)
                 loss = F.cross_entropy(logits, y_spt[i])
                 # 2. compute grad on theta_pi
-                
-                # if k == self.update_step - 1:
-                #     total_weight = torch.sum(torch.cat([torch.norm((f_p - p.detach().clone())**2).view(1,-1) for f_p, p in zip(fast_weights, self.net.parameters())]))
-                #     # print(total_weight)
-                #     loss = loss + 1e-2 * total_weight
 
                 grad = torch.autograd.grad(loss, fast_weights)
                 # 3. theta_pi = theta_pi - train_lr * grad
                 fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, fast_weights)))
 
 
-            u_state = [u.detach().clone().requires_grad_() for u in fast_weights]
 
-            logits_q = self.net(x_qry[i], u_state, bn_training=True)
+            logits_q = self.net(x_qry[i], u=fast_weights, bn_training=True)
             # loss_q will be overwritten and just keep the loss_q on last update step.
             loss_q = F.cross_entropy(logits_q, y_qry[i]); losses_q[1] += loss_q
                  
