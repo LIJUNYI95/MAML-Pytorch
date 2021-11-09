@@ -3,7 +3,7 @@ import  numpy as np
 from    omniglotNShot import OmniglotNShot
 import  argparse
 import pdb
-from   meta_ori import Meta
+from   meta import Meta
 
 def main(args):
 
@@ -13,8 +13,8 @@ def main(args):
     save_dir = os.environ['PROJECT']
     print(args)
     if not args.dimi_m_coef:
-        prefix = save_dir + '/MAML/results/ori_beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
-        save_path = save_dir + '/MAML/models/ori_beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
+        prefix = save_dir + '/MAML/results/test_beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
+        save_path = save_dir + '/MAML/models/test_beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
     else:
         prefix = save_dir + '/MAML/results/beta_dim' + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
         save_path = save_dir + '/MAML/models/beta_dim' + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)

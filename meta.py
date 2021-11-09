@@ -124,12 +124,7 @@ class Meta(nn.Module):
             for tmp_w, cur_w in zip(tmp_weight, u_state):
                 tmp_w += cur_w/task_num
 
-            logits_q = self.net(x_qry[i], u_state, bn_training=True)
-            # loss_q will be overwritten and just keep the loss_q on last update step.
-            loss_q = F.cross_entropy(logits_q, y_qry[i]); losses_q[1] += loss_q
-            grad_q = torch.autograd.grad(loss_q, u_state)
-            grad = torch.autograd.grad(fast_weights, self.net.parameters(), grad_outputs=grad_q)
-            for tmp_g, cur_g in zip(tmp_grad, grad):
+            for tmp_g, cur_g in zip(tmp_grad, fast_weights):
                 tmp_g += cur_g/task_num 
                  
             with torch.no_grad():
@@ -137,12 +132,15 @@ class Meta(nn.Module):
                 correct = torch.eq(pred_q, y_qry[i]).sum().item()  # convert to numpy
                 corrects[1] += correct
 
-        
 
+        logits_q = self.net(x_qry[i], tmp_weight, bn_training=True)
+        loss_q = F.cross_entropy(logits_q, y_qry[i]); losses_q[1] += loss_q
+        grad_q = torch.autograd.grad(loss_q, u_state)     
+        grad = torch.autograd.grad(tmp_grad, self.net.parameters(), grad_outputs=grad_q)
         # optimize theta parameters
         self.momentum_weight = [u.detach().clone() for u in tmp_weight]
         self.meta_optim.zero_grad()
-        for p, g in zip(self.net.parameters(), tmp_grad):
+        for p, g in zip(self.net.parameters(), grad):
             p.grad = g.clone()
         # loss_q.backward()
         self.meta_optim.step()
