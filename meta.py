@@ -135,7 +135,8 @@ class Meta(nn.Module):
 
         logits_q = self.net(x_qry[i], tmp_weight, bn_training=True)
         loss_q = F.cross_entropy(logits_q, y_qry[i]); losses_q[1] += loss_q
-        grad_q = torch.autograd.grad(loss_q, u_state)     
+        grad_q = torch.autograd.grad(loss_q, u_state)
+        pdb.set_trace()     
         grad = torch.autograd.grad(tmp_grad, self.net.parameters(), grad_outputs=grad_q)
         # optimize theta parameters
         self.momentum_weight = [u.detach().clone() for u in tmp_weight]
