@@ -129,13 +129,13 @@ class Meta(nn.Module):
 
 
         logits_q = self.net(x_qry[i], tmp_weight, bn_training=True)
-        loss_q = F.cross_entropy(logits_q, y_qry[i]); losses_q[1] += loss_q.detach().clone()
+        loss_q = F.cross_entropy(logits_q, y_qry[i]); losses_q[1] += loss_q.detach().clone() * task_num
         grad_q = torch.autograd.grad(loss_q, u_state)
 
         with torch.no_grad():
             pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
             correct = torch.eq(pred_q, y_qry[i]).sum().item()  # convert to numpy
-            corrects[1] += correct
+            corrects[1] += correct * task_num
 
         # pdb.set_trace()     
         grad = torch.autograd.grad(tmp_grad, self.net.parameters(), grad_outputs=grad_q)
