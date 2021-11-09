@@ -108,7 +108,7 @@ class Meta(nn.Module):
 
 
 
-            logits_q = self.net(x_qry[i], u=fast_weights, bn_training=True)
+            logits_q = self.net(x_qry[i], fast_weights, bn_training=True)
             # loss_q will be overwritten and just keep the loss_q on last update step.
             loss_q = F.cross_entropy(logits_q, y_qry[i]); losses_q[1] += loss_q
                  
