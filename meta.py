@@ -140,6 +140,7 @@ class Meta(nn.Module):
         # pdb.set_trace()     
         grad = torch.autograd.grad(tmp_grad, self.net.parameters(), grad_outputs=grad_q)
         # optimize theta parameters
+        print(grad[-1])
         self.momentum_weight = [u.detach().clone() for u in tmp_weight]
         self.meta_optim.zero_grad()
         for p, g in zip(self.net.parameters(), grad):
