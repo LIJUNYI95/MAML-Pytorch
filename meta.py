@@ -127,16 +127,18 @@ class Meta(nn.Module):
             for tmp_g, cur_g in zip(tmp_grad, fast_weights):
                 tmp_g = tmp_g + cur_g/task_num 
                  
-            with torch.no_grad():
-                pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-                correct = torch.eq(pred_q, y_qry[i]).sum().item()  # convert to numpy
-                corrects[1] += correct
 
 
         logits_q = self.net(x_qry[i], tmp_weight, bn_training=True)
-        loss_q = F.cross_entropy(logits_q, y_qry[i]); losses_q[1] += loss_q
+        loss_q = F.cross_entropy(logits_q, y_qry[i]); losses_q[1] += loss_q.detach().clone()
         grad_q = torch.autograd.grad(loss_q, u_state)
-        pdb.set_trace()     
+
+        with torch.no_grad():
+            pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
+            correct = torch.eq(pred_q, y_qry[i]).sum().item()  # convert to numpy
+            corrects[1] += correct
+
+        # pdb.set_trace()     
         grad = torch.autograd.grad(tmp_grad, self.net.parameters(), grad_outputs=grad_q)
         # optimize theta parameters
         self.momentum_weight = [u.detach().clone() for u in tmp_weight]
