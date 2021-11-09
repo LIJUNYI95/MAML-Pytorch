@@ -137,7 +137,7 @@ class Meta(nn.Module):
             correct = torch.eq(pred_q, y_qry[i]).sum().item()  # convert to numpy
             corrects[1] += correct
 
-        pdb.set_trace()     
+        # pdb.set_trace()     
         grad = torch.autograd.grad(tmp_grad, self.net.parameters(), grad_outputs=grad_q)
         # optimize theta parameters
         self.momentum_weight = [u.detach().clone() for u in tmp_weight]
