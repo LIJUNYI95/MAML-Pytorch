@@ -92,7 +92,7 @@ class Meta(nn.Module):
                 losses_q[0] += loss_q
 
                 pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-                correct = torch.eq(pred_q, y_qry).sum().item()
+                correct = torch.eq(pred_q, y_qry[i]).sum().item()
                 corrects[0] = corrects[0] + correct
 
 
@@ -132,7 +132,7 @@ class Meta(nn.Module):
 
             with torch.no_grad():
                 pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-                correct = torch.eq(pred_q, y_qry).sum().item()
+                correct = torch.eq(pred_q, y_qry[i]).sum().item()
                 corrects[1] = corrects[1] + correct
             tmp_grad = [tmp_g + fast_g/task_num for tmp_g, fast_g in zip(tmp_grad, grad_q)]
 
