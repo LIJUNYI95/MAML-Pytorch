@@ -124,8 +124,7 @@ class Meta(nn.Module):
             for tmp_w, cur_w in zip(tmp_weight, u_state):
                 tmp_w += cur_w/task_num
 
-            for tmp_g, cur_g in zip(tmp_grad, fast_weights):
-                tmp_g = tmp_g + cur_g/task_num 
+            tmp_grad = [tmp_g + cur_w/task_num for tmp_g, cur_w in zip(tmp_grad, fast_weights)]
                  
 
 
