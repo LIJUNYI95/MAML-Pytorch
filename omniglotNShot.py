@@ -59,12 +59,12 @@ class OmniglotNShot:
                         target_transform=Categorical(num_classes=n_way),
                         # Creates new virtual classes with rotated versions \
                         # of the images (from Santoro et al., 2016)
-                        # class_augmentations=[Rotation([90, 180, 270])],
+                        class_augmentations=[Rotation([90, 180, 270])],
                         meta_val=True,
                         download=True)
 
         dataset_val = ClassSplitter(dataset_val, shuffle=True, num_train_per_class=k_shot, \
-            num_test_per_class=1)
+            num_test_per_class=15)
         self.dataloader_val = BatchMetaDataLoader(dataset_val, shuffle=True, batch_size=batchsz, num_workers=4)
 
 
