@@ -39,7 +39,7 @@ class OmniglotNShot:
                         target_transform=Categorical(num_classes=n_way),
                         # Creates new virtual classes with rotated versions \
                         # of the images (from Santoro et al., 2016)
-                        class_augmentations=[Rotation([90, 180, 270])],
+                        class_augmentations=[Rotation([30, 90, 120, 180, 270])],
                         meta_train=True,
                         download=True)
 
@@ -59,7 +59,7 @@ class OmniglotNShot:
                         target_transform=Categorical(num_classes=n_way),
                         # Creates new virtual classes with rotated versions \
                         # of the images (from Santoro et al., 2016)
-                        class_augmentations=[Rotation([90, 180, 270])],
+                        class_augmentations=[Rotation([30, 90, 120, 180, 270])],
                         meta_val=True,
                         download=True)
 
