@@ -26,7 +26,8 @@ def main(args):
     else:
         info += 'const'
 
-    info +=  add_info('beta', args.m_coef) + add_info('way', args.n_way) + add_info('shot', args.k_spt) + add_info('task_num', args.task_num)
+    info +=  add_info('beta', args.m_coef) + add_info('way', args.n_way) + add_info('shot', args.k_spt)\
+         + add_info('task_num', args.task_num) + add_info('inner_step', args.update_step)
 
     prefix = result_path + info
     save_path = model_path + info
