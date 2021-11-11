@@ -10,14 +10,27 @@ def main(args):
     torch.manual_seed(222)
     torch.cuda.manual_seed_all(222)
     np.random.seed(222)
-    save_dir = os.environ['PROJECT']
     print(args)
-    if not args.dimi_m_coef:
-        prefix = save_dir + '/MAML/results/test_beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
-        save_path = save_dir + '/MAML/models/test_beta_'+ str(args.m_coef) + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
+
+    def add_info(name, value):
+        return '_' + name + '_' + str(value)
+
+
+    save_dir = os.environ['PROJECT']
+    model_path = save_dir + '/MAML/models/'
+    result_path = save_dir + '/MAML/results/'
+    
+    info = ''
+    if args.dimi_m_coef:
+        info += 'dim'
     else:
-        prefix = save_dir + '/MAML/results/beta_dim' + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
-        save_path = save_dir + '/MAML/models/beta_dim' + '_way_' + str(args.n_way) + '_shot_' + str(args.k_spt)
+        info += 'const'
+
+    info +=  add_info('beta', args.m_coef) + add_info('way', args.n_way) + add_info('shot', args.k_spt) + add_info('task_num', args.task_num)
+
+    prefix = result_path + info
+    save_path = model_path + info
+
     config = [
         ('conv2d', [64, 1, 3, 3, 2, 0]),
         ('relu', [True]),
