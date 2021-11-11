@@ -74,6 +74,7 @@ class Meta(nn.Module):
         :param y_qry:   [b, querysz]
         :return:
         """
+        pdb.set_trace()
         task_num, setsz, c_, h, w = x_spt.size()
         querysz = x_qry.size(1)
 
