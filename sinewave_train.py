@@ -67,7 +67,7 @@ def main(args):
     for batch in db_train.dataloader:
         train_size= int(args.k_spt * 0.2)
         pdb.set_trace()
-        x_val, y_val = batch[0].astype(torch.double), batch[1].astype(torch.double)
+        x_val, y_val = batch[0].double(), batch[1].double()
         x_spt, y_spt = x_val[:,:train_size,:], y_val[:,:train_size,:]
         x_qry, y_qry = x_val[:,train_size:,:], y_val[:,train_size:,:]
 
