@@ -1,4 +1,3 @@
-from    omniglot import Omniglot
 # import  torchvision.transforms as transforms
 from torchmeta.datasets import Omniglot, MiniImagenet
 from torchmeta.transforms import Categorical, ClassSplitter, Rotation
