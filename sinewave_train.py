@@ -97,13 +97,11 @@ def main(args):
             test_step = 0
             # for _ in range(600//args.task_num):
             for test_batch in db_train.dataloader_val:
-                # test
-                # x_spt, y_spt, x_qry, y_qry = db_train.next('test')
-                # x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).to(device), \
-                #                              torch.from_numpy(x_qry).to(device), torch.from_numpy(y_qry).to(device)
 
-                x_spt, y_spt = test_batch['train']
-                x_qry, y_qry = test_batch['test']
+                train_size= int(args.k_spt * 0.2)
+                x_val, y_val = test_batch[0].float(), test_batch[1].float()
+                x_spt, y_spt = x_val[:,:train_size,:], y_val[:,:train_size,:]
+                x_qry, y_qry = x_val[:,train_size:,:], y_val[:,train_size:,:]
                 x_spt, y_spt, x_qry, y_qry = x_spt.to(device), y_spt.to(device), x_qry.to(device), y_qry.to(device)
 
                 # split to single task each time
