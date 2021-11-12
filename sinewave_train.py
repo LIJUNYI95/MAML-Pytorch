@@ -65,9 +65,11 @@ def main(args):
     step = len(train_acc)
     # for step in range(len(train_acc), args.epoch):
     for batch in db_train.dataloader:
+        train_size= int(args.k_spt * 0.8)
         pdb.set_trace()
-        x_spt, y_spt = batch['train']
-        x_qry, y_qry = batch['test']
+        x_val, y_val = batch[0], batch[1]
+        x_spt, y_spt = x_val[:,:train_size,:], y_val[:,:train_size,:]
+        x_qry, y_qry = x_val[:,train_size:,:], y_val[:,train_size:,:]
 
         # pdb.set_trace()
         # x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).to(device), \
