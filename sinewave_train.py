@@ -131,7 +131,7 @@ if __name__ == '__main__':
     argparser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=1e-3)
     argparser.add_argument('--m_coef', type=float, help='momentum coefficient for SCGD', default=1)
     argparser.add_argument('--mu', type=float, help='momentum coefficient for SCGD outer update', default=0)
-    argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.4)
+    argparser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.01)
     argparser.add_argument('--update_step', type=int, help='task-level inner update steps', default=1)
     argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=5)
     argparser.add_argument('--dimi_m_coef', dest='dimi_m_coef', action='store_true')
