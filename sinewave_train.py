@@ -66,7 +66,7 @@ def main(args):
     # for step in range(len(train_acc), args.epoch):
     for batch in db_train.dataloader:
         train_size= int(args.k_spt * 0.2)
-        pdb.set_trace()
+        # pdb.set_trace()
         x_val, y_val = batch[0].float(), batch[1].float()
         x_spt, y_spt = x_val[:,:train_size,:], y_val[:,:train_size,:]
         x_qry, y_qry = x_val[:,train_size:,:], y_val[:,train_size:,:]
