@@ -188,7 +188,6 @@ class Learner(nn.Module):
 
         # make sure variable is used properly
         assert idx == len(vars)
-        assert bn_idx == len(self.vars_bn)
 
 
         return x
