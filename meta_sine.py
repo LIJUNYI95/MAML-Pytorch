@@ -367,8 +367,6 @@ class Meta(nn.Module):
         :param y_qry:   [querysz]
         :return:
         """
-        assert len(x_spt.shape) == 4
-
         querysz = x_qry.size(0)
 
         losses_q = [0 for _ in range(self.update_step_test + 1)] 
