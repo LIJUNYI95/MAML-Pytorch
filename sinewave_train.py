@@ -113,8 +113,8 @@ def main(args):
                 # [b, update_step+1]
                 losses = np.array(losses).mean(axis=0).astype(np.float16)
                 print('Test loss:', losses)
-                
-                
+
+                val_loss.append(losses[-1])
                 np.save(prefix +'val_loss.npy', val_loss)
 
             step += 1
