@@ -279,8 +279,8 @@ class Meta(nn.Module):
         :param y_qry:   [b, querysz]
         :return:
         """
-        # pdb.set_trace()
-        task_num, setsz, c_, h, w = x_spt.size()
+        pdb.set_trace()
+        task_num, setsz, _ = x_spt.size()
         querysz = x_qry.size(1)
 
         losses_q = [0 for _ in range(2)]  # losses_q[i] is the loss on step i
