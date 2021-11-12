@@ -293,7 +293,7 @@ class Meta(nn.Module):
             with torch.no_grad():
                 # [setsz, nway]
                 logits_q = self.net(x_qry[i], self.net.parameters(), bn_training=True)
-                loss_q = F.cross_entropy(logits_q, y_qry[i])
+                loss_q = F.mse_loss(logits_q, y_qry[i])
                 losses_q[0] += loss_q
 
                 pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
@@ -332,7 +332,7 @@ class Meta(nn.Module):
         tmp_grad = [torch.zeros_like(p) for p in self.net.parameters()]
         for i in range(task_num):
             logits_q = self.net(x_qry[i], tmp_state, bn_training=True)
-            loss_q = F.cross_entropy(logits_q, y_qry[i]); losses_q[1] += loss_q.detach().clone()
+            loss_q = F.mse_loss(logits_q, y_qry[i]); losses_q[1] += loss_q.detach().clone()
             grad_q = torch.autograd.grad(loss_q, tmp_state)
 
             with torch.no_grad():
@@ -380,7 +380,7 @@ class Meta(nn.Module):
 
         # 1. run the i-th task and compute loss for k=0
         logits = net(x_spt)
-        loss = F.cross_entropy(logits, y_spt)
+        loss = F.mse_loss(logits, y_spt)
         grad = torch.autograd.grad(loss, net.parameters())
         fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, net.parameters())))
 
@@ -388,7 +388,7 @@ class Meta(nn.Module):
         with torch.no_grad():
             # [setsz, nway]
             logits_q = net(x_qry, net.parameters(), bn_training=True)
-            loss_q = F.cross_entropy(logits_q, y_qry)
+            loss_q = F.mse_loss(logits_q, y_qry)
             losses_q[0] += loss_q
             # [setsz]
             pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
@@ -399,7 +399,7 @@ class Meta(nn.Module):
         with torch.no_grad():
             # [setsz, nway]
             logits_q = net(x_qry, fast_weights, bn_training=True)
-            loss_q = F.cross_entropy(logits_q, y_qry)
+            loss_q = F.mse_loss(logits_q, y_qry)
             losses_q[1] += loss_q
             # [setsz]
             pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
@@ -410,7 +410,7 @@ class Meta(nn.Module):
         for k in range(1, self.update_step_test):
             # 1. run the i-th task and compute loss for k=1~K-1
             logits = net(x_spt, fast_weights, bn_training=True)
-            loss = F.cross_entropy(logits, y_spt)
+            loss = F.mse_loss(logits, y_spt)
             # 2. compute grad on theta_pi
             grad = torch.autograd.grad(loss, fast_weights)
             # 3. theta_pi = theta_pi - train_lr * grad
@@ -418,7 +418,7 @@ class Meta(nn.Module):
 
             logits_q = net(x_qry, fast_weights, bn_training=True)
             # loss_q will be overwritten and just keep the loss_q on last update step.
-            loss_q = F.cross_entropy(logits_q, y_qry)
+            loss_q = F.mse_loss(logits_q, y_qry)
             losses_q[k + 1] += loss_q
 
             with torch.no_grad():
