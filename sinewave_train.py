@@ -3,7 +3,7 @@ import  numpy as np
 from    SineWave import SineWave
 import  argparse
 import pdb
-from   meta import Meta
+from   meta_sine import Meta
 
 def main(args):
 
