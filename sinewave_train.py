@@ -61,65 +61,65 @@ def main(args):
                        k_shot=args.k_spt)
 
     step = len(train_loss)
-    # for step in range(len(train_acc), args.epoch):
-    for batch in db_train.dataloader:
-        train_size= int(args.k_spt * 0.2)
-        # pdb.set_trace()
-        x_val, y_val = batch[0].float(), batch[1].float()
-        x_spt, y_spt = x_val[:,:train_size,:], y_val[:,:train_size,:]
-        x_qry, y_qry = x_val[:,train_size:,:], y_val[:,train_size:,:]
+    while True:
+        for batch in db_train.dataloader:
+            train_size= int(args.k_spt * 0.2)
+            # pdb.set_trace()
+            x_val, y_val = batch[0].float(), batch[1].float()
+            x_spt, y_spt = x_val[:,:train_size,:], y_val[:,:train_size,:]
+            x_qry, y_qry = x_val[:,train_size:,:], y_val[:,train_size:,:]
 
-        # pdb.set_trace()
-        # x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).to(device), \
-        #                              torch.from_numpy(x_qry).to(device), torch.from_numpy(y_qry).to(device)
-        x_spt, y_spt, x_qry, y_qry = x_spt.to(device), y_spt.to(device), \
-                                     x_qry.to(device), y_qry.to(device)
+            # pdb.set_trace()
+            # x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).to(device), \
+            #                              torch.from_numpy(x_qry).to(device), torch.from_numpy(y_qry).to(device)
+            x_spt, y_spt, x_qry, y_qry = x_spt.to(device), y_spt.to(device), \
+                                        x_qry.to(device), y_qry.to(device)
 
-        # set traning=True to update running_mean, running_variance, bn_weights, bn_bias
-        if args.dimi_m_coef: maml.m_coef =  max(1/(step // 5000 + 1) ** 0.5, 0.2)
-        losses = maml(x_spt, y_spt, x_qry, y_qry)
-        train_loss.append(losses[-1])
+            # set traning=True to update running_mean, running_variance, bn_weights, bn_bias
+            if args.dimi_m_coef: maml.m_coef =  max(1/(step // 5000 + 1) ** 0.5, 0.2)
+            losses = maml(x_spt, y_spt, x_qry, y_qry)
+            train_loss.append(losses[-1])
 
-        if step % 50 == 0:
-            print('step:', step, '\ttraining loss:', losses)
-            
-            np.save(prefix +'train_loss.npy', train_loss)
-            
-            torch.save(maml.net.state_dict(), save_path)
-            
-            
-            
-        if step % 500 == 0:
-            losses = []
-            test_step = 0
-            # for _ in range(600//args.task_num):
-            for test_batch in db_train.dataloader_val:
-
-                train_size= int(args.k_spt * 0.2)
-                x_val, y_val = test_batch[0].float(), test_batch[1].float()
-                x_spt, y_spt = x_val[:,:train_size,:], y_val[:,:train_size,:]
-                x_qry, y_qry = x_val[:,train_size:,:], y_val[:,train_size:,:]
-                x_spt, y_spt, x_qry, y_qry = x_spt.to(device), y_spt.to(device), x_qry.to(device), y_qry.to(device)
-
-                # split to single task each time
-                for x_spt_one, y_spt_one, x_qry_one, y_qry_one in zip(x_spt, y_spt, x_qry, y_qry):
-                    test_loss = maml.finetunning(x_spt_one, y_spt_one, x_qry_one, y_qry_one)
-                    losses.append(test_loss)
+            if step % 50 == 0:
+                print('step:', step, '\ttraining loss:', losses)
                 
-                test_step += args.task_num
-                if test_step > 100:
-                    break
+                np.save(prefix +'train_loss.npy', train_loss)
+                
+                torch.save(maml.net.state_dict(), save_path)
+                
+                
+                
+            if step % 500 == 0:
+                losses = []
+                test_step = 0
+                # for _ in range(600//args.task_num):
+                for test_batch in db_train.dataloader_val:
 
-            # [b, update_step+1]
-            losses = np.array(losses).mean(axis=0).astype(np.float16)
-            print('Test loss:', losses)
-            
-            
-            np.save(prefix +'val_loss.npy', val_loss)
+                    train_size= int(args.k_spt * 0.2)
+                    x_val, y_val = test_batch[0].float(), test_batch[1].float()
+                    x_spt, y_spt = x_val[:,:train_size,:], y_val[:,:train_size,:]
+                    x_qry, y_qry = x_val[:,train_size:,:], y_val[:,train_size:,:]
+                    x_spt, y_spt, x_qry, y_qry = x_spt.to(device), y_spt.to(device), x_qry.to(device), y_qry.to(device)
 
-        step += 1
-        if step > args.epoch:
-            break
+                    # split to single task each time
+                    for x_spt_one, y_spt_one, x_qry_one, y_qry_one in zip(x_spt, y_spt, x_qry, y_qry):
+                        test_loss = maml.finetunning(x_spt_one, y_spt_one, x_qry_one, y_qry_one)
+                        losses.append(test_loss)
+                    
+                    test_step += args.task_num
+                    if test_step > 100:
+                        break
+
+                # [b, update_step+1]
+                losses = np.array(losses).mean(axis=0).astype(np.float16)
+                print('Test loss:', losses)
+                
+                
+                np.save(prefix +'val_loss.npy', val_loss)
+
+            step += 1
+            if step > args.epoch:
+                break
 
 if __name__ == '__main__':
 
