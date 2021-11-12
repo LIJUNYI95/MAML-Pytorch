@@ -302,7 +302,7 @@ class Meta(nn.Module):
                 # 1. run the i-th task and compute loss for k=1~K-1
                 logits = self.net(x_spt[i], fast_weights, bn_training=True)
                 loss = F.mse_loss(logits, y_spt[i])
-                print(k,loss)
+                # print(k,loss)
                 # 2. compute grad on theta_pi
                 
                 # if k == self.update_step - 1:
