@@ -283,7 +283,6 @@ class Meta(nn.Module):
         querysz = x_qry.size(1)
 
         losses_q = [0 for _ in range(2)]  # losses_q[i] is the loss on step i
-        corrects = [0 for _ in range(2)]
 
 
         # this is the loss and accuracy before first update
@@ -295,10 +294,6 @@ class Meta(nn.Module):
                 logits_q = self.net(x_qry[i], self.net.parameters(), bn_training=True)
                 loss_q = F.mse_loss(logits_q, y_qry[i])
                 losses_q[0] += loss_q
-
-                pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-                correct = torch.eq(pred_q, y_qry[i]).sum().item()
-                corrects[0] = corrects[0] + correct
 
 
             fast_weights = list(map(lambda p: p, self.net.parameters()))
@@ -335,10 +330,6 @@ class Meta(nn.Module):
             loss_q = F.mse_loss(logits_q, y_qry[i]); losses_q[1] += loss_q.detach().clone()
             grad_q = torch.autograd.grad(loss_q, tmp_state)
 
-            with torch.no_grad():
-                pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-                correct = torch.eq(pred_q, y_qry[i]).sum().item()
-                corrects[1] = corrects[1] + correct
             tmp_grad = [tmp_g + fast_g/task_num for tmp_g, fast_g in zip(tmp_grad, grad_q)]
 
         
@@ -352,10 +343,8 @@ class Meta(nn.Module):
         # loss_q.backward()
         self.meta_optim.step()
 
-
-        accs = np.array(corrects) / (querysz * task_num)
         losses = np.array([l.data.cpu().numpy().item() for l in losses_q]) / task_num
-        return accs, losses
+        return losses
 
 
     def finetunning(self, x_spt, y_spt, x_qry, y_qry):
@@ -389,9 +378,6 @@ class Meta(nn.Module):
             loss_q = F.mse_loss(logits_q, y_qry)
             losses_q[0] += loss_q
             # [setsz]
-            pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-            correct = torch.eq(pred_q, y_qry).sum().item()
-            corrects[0] = corrects[0] + correct
 
         # this is the loss and accuracy after the first update
         with torch.no_grad():
@@ -400,10 +386,6 @@ class Meta(nn.Module):
             loss_q = F.mse_loss(logits_q, y_qry)
             losses_q[1] += loss_q
             # [setsz]
-            pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-            # scalar
-            correct = torch.eq(pred_q, y_qry).sum().item()
-            corrects[1] = corrects[1] + correct
 
         for k in range(1, self.update_step_test):
             # 1. run the i-th task and compute loss for k=1~K-1
@@ -419,18 +401,12 @@ class Meta(nn.Module):
             loss_q = F.mse_loss(logits_q, y_qry)
             losses_q[k + 1] += loss_q
 
-            with torch.no_grad():
-                pred_q = F.softmax(logits_q, dim=1).argmax(dim=1)
-                correct = torch.eq(pred_q, y_qry).sum().item()  # convert to numpy
-                corrects[k + 1] = corrects[k + 1] + correct
-
 
         del net
 
-        accs = np.array(corrects) / querysz
         losses = np.array([l.data.cpu().numpy().item() for l in losses_q])
 
-        return accs, losses
+        return losses
 
 
 

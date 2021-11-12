@@ -51,18 +51,16 @@ def main(args):
     
     if args.restore:
         train_loss = list(np.load(prefix +'train_loss.npy'))
-        train_acc = list(np.load(prefix +'train_acc.npy'))
         val_loss = list(np.load(prefix +'val_loss.npy'))
-        val_acc = list(np.load(prefix +'val_acc.npy'))
     else:
-        train_acc =[]; val_acc = []; train_loss = []; val_loss = []
+        train_loss = []; val_loss = []
 
 
     db_train = SineWave('SineWave',
                        batchsz=args.task_num,
                        k_shot=args.k_spt)
 
-    step = len(train_acc)
+    step = len(train_loss)
     # for step in range(len(train_acc), args.epoch):
     for batch in db_train.dataloader:
         train_size= int(args.k_spt * 0.2)
@@ -79,21 +77,20 @@ def main(args):
 
         # set traning=True to update running_mean, running_variance, bn_weights, bn_bias
         if args.dimi_m_coef: maml.m_coef =  max(1/(step // 5000 + 1) ** 0.5, 0.2)
-        accs, losses = maml(x_spt, y_spt, x_qry, y_qry)
-        train_acc.append(accs[-1]); train_loss.append(losses[-1])
+        losses = maml(x_spt, y_spt, x_qry, y_qry)
+        train_loss.append(losses[-1])
 
         if step % 50 == 0:
-            print('step:', step, '\ttraining acc:', accs, '\ttraining loss:', losses)
+            print('step:', step, '\ttraining loss:', losses)
             
             np.save(prefix +'train_loss.npy', train_loss)
-            np.save(prefix +'train_acc.npy', train_acc)
             
             torch.save(maml.net.state_dict(), save_path)
             
             
             
         if step % 500 == 0:
-            accs = []; losses = []
+            losses = []
             test_step = 0
             # for _ in range(600//args.task_num):
             for test_batch in db_train.dataloader_val:
@@ -106,22 +103,19 @@ def main(args):
 
                 # split to single task each time
                 for x_spt_one, y_spt_one, x_qry_one, y_qry_one in zip(x_spt, y_spt, x_qry, y_qry):
-                    test_acc, test_loss = maml.finetunning(x_spt_one, y_spt_one, x_qry_one, y_qry_one)
-                    accs.append(test_acc); losses.append(test_loss)
+                    test_loss = maml.finetunning(x_spt_one, y_spt_one, x_qry_one, y_qry_one)
+                    losses.append(test_loss)
                 
                 test_step += args.task_num
                 if test_step > 100:
                     break
 
             # [b, update_step+1]
-            accs = np.array(accs).mean(axis=0).astype(np.float16)
             losses = np.array(losses).mean(axis=0).astype(np.float16)
-            print('Test acc:', accs, '\tTest loss:', losses)
+            print('Test loss:', losses)
             
-            val_acc.append(accs[-1]); val_loss.append(losses[-1])
             
             np.save(prefix +'val_loss.npy', val_loss)
-            np.save(prefix +'val_acc.npy', val_acc)
 
         step += 1
         if step > args.epoch:
