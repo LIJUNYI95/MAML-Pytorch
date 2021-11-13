@@ -35,6 +35,8 @@ def main(args):
     config = [
         ('linear', [40, 1]),
         ('relu', [True]),
+        ('linear', [40, 40]),
+        ('relu', [True]),
         ('linear', [1, 40])
     ]
 
