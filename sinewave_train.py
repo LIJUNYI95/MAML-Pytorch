@@ -97,7 +97,7 @@ def main(args):
                 # for _ in range(600//args.task_num):
                 for test_batch in db_train.dataloader_val:
 
-                    train_size= int(args.k_spt * 0.2)
+                    train_size= args.k_spt
                     x_val, y_val = test_batch[0].float(), test_batch[1].float()
                     x_spt, y_spt = x_val[:,:train_size,:], y_val[:,:train_size,:]
                     x_qry, y_qry = x_val[:,train_size:,:], y_val[:,train_size:,:]
