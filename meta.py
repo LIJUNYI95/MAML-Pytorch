@@ -138,7 +138,7 @@ class Meta(nn.Module):
             tmp_grad = [tmp_g + fast_g/task_num for tmp_g, fast_g in zip(tmp_grad, grad_q)]
 
         
-        grad = torch.autograd.grad(fast_weights, self.net.parameters(), grad_outputs=tmp_grad)
+        grad = torch.autograd.grad(tmp_weights, self.net.parameters(), grad_outputs=tmp_grad)
         # optimize theta parameters
         # print(grad[-1])
         self.momentum_weight = [u.detach().clone() for u in tmp_state]
