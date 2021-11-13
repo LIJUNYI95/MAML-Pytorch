@@ -107,8 +107,8 @@ def main(args):
                         losses.append(test_loss)
                     
                     test_step += args.task_num
-                    # if test_step > 100:
-                    #     break
+                    if test_step > 100:
+                        break
 
                 # [b, update_step+1]
                 losses = np.array(losses).mean(axis=0).astype(np.float16)
