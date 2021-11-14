@@ -20,14 +20,17 @@ def main(args):
     model_path = save_dir + '/MAML/models/'
     result_path = save_dir + '/MAML/results/'
     
-    info = ''
+    info = 'sinewave_' + args.opt + '_'
     if args.dimi_m_coef:
         info += 'dim'
     else:
         info += 'const'
 
     info +=  add_info('beta', args.m_coef) + add_info('way', args.n_way) + add_info('shot', args.k_spt)\
-         + add_info('task_num', args.task_num) + add_info('inner_step', args.update_step) + add_info('qry_size', args.k_qry)
+         + add_info('task_num', args.task_num) + add_info('inner_step', args.update_step) + add_info('qry_size', args.k_qry) + add_info('lr', args.meta_lr)
+
+    if args.opt == 'momentum':
+        info += add_info('mu', args.mu)
 
     prefix = result_path + info
     save_path = model_path + info
@@ -158,6 +161,7 @@ if __name__ == '__main__':
     argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=2)
     argparser.add_argument('--dimi_m_coef', dest='dimi_m_coef', action='store_true')
     argparser.add_argument('--restore', dest='restore', action='store_true')
+    argparser.add_argument('--opt', type=str, help='sgd/momentum/adam', default='sgd')
 
 
     args = argparser.parse_args()
