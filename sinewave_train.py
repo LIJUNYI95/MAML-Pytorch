@@ -95,7 +95,7 @@ def main(args):
             
             
             
-        if step % 2000 == 0:
+        if step % 500 == 0:
             losses = []
             test_step = 0
             # for _ in range(600//args.task_num):
