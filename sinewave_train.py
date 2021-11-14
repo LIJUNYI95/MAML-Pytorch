@@ -95,7 +95,7 @@ def main(args):
             
             
             
-        if step % 500 == 0:
+        if step % 2000 == 0:
             losses = []
             test_step = 0
             # for _ in range(600//args.task_num):
@@ -113,7 +113,7 @@ def main(args):
                     losses.append(test_loss)
                 
                 test_step += args.task_num
-                if test_step > 100:
+                if test_step > 1000:
                     break
 
             # [b, update_step+1]
