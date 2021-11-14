@@ -236,11 +236,14 @@ class Meta(nn.Module):
         self.task_num = args.task_num
         self.update_step = args.update_step
         self.update_step_test = args.update_step_test
+        self.opt = args.optimizer
 
 
         self.net = Learner(config)
         self.momentum_weight = None
-        if self.mu > 0:
+        if self.opt ==  'sgd':
+            self.meta_optim = optim.SGD(self.net.parameters(), lr=self.meta_lr)
+        elif self.opt == 'moementum':
             self.meta_optim = optim.SGD(self.net.parameters(), lr=self.meta_lr, momentum=self.mu)
         else:
             self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
