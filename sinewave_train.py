@@ -113,7 +113,7 @@ def main(args):
                     losses.append(test_loss)
                 
                 test_step += args.task_num
-                if test_step > 1000:
+                if test_step > 600:
                     break
 
             # [b, update_step+1]
