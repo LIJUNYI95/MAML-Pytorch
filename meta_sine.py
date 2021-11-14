@@ -236,7 +236,7 @@ class Meta(nn.Module):
         self.task_num = args.task_num
         self.update_step = args.update_step
         self.update_step_test = args.update_step_test
-        self.opt = args.optimizer
+        self.opt = args.opt
 
 
         self.net = Learner(config)
