@@ -23,7 +23,7 @@ class SineWave:
         :param imgsz:
         """
 
-        dataset = Sinusoid(num_samples_per_task=k_shot + 15, num_tasks=1000000)
+        dataset = Sinusoid(num_samples_per_task=k_shot + 15, num_tasks=100)
 
         self.dataloader = BatchMetaDataLoader(dataset, batch_size=batchsz, num_workers=4)
 
