@@ -20,7 +20,7 @@ def main(args):
     model_path = save_dir + '/MAML/models/'
     result_path = save_dir + '/MAML/results/'
     
-    info = 'sinewave_' + args.opt + '_'
+    info = 'omni_' + args.opt + '_'
     if args.dimi_m_coef:
         info += 'dim'
     else:
