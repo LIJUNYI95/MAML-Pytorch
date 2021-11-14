@@ -100,7 +100,7 @@ def main(args):
             test_step = 0
             # for _ in range(600//args.task_num):
             while True:
-                test_batch = db_train.gen_one_task()
+                test_batch = db_train.gen_one_test_task()
                 train_size= args.k_spt
                 x_val, y_val = test_batch[0].float(), test_batch[1].float()
                 x_spt, y_spt = x_val[:,:train_size,:], y_val[:,:train_size,:]
