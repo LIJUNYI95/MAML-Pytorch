@@ -243,7 +243,7 @@ class Meta(nn.Module):
         self.momentum_weight = None
         if self.opt ==  'sgd':
             self.meta_optim = optim.SGD(self.net.parameters(), lr=self.meta_lr)
-        elif self.opt == 'moementum':
+        elif self.opt == 'momentum':
             self.meta_optim = optim.SGD(self.net.parameters(), lr=self.meta_lr, momentum=self.mu)
         else:
             self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
