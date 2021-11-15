@@ -296,7 +296,7 @@ class Meta(nn.Module):
             with torch.no_grad():
                 # [setsz, nway]
                 logits_q = self.net(x_qry[i], self.net.parameters(), bn_training=True)
-                loss_q = F.mse_loss(logits_q, y_qry[i])
+                loss_q = F.mse_loss(logits_q, y_qry[i])/querysz
                 losses_q[0] += loss_q
 
 
@@ -305,7 +305,7 @@ class Meta(nn.Module):
             for k in range(self.update_step):
                 # 1. run the i-th task and compute loss for k=1~K-1
                 logits = self.net(x_spt[i], fast_weights, bn_training=True)
-                loss = F.mse_loss(logits, y_spt[i])
+                loss = F.mse_loss(logits, y_spt[i])/setsz
                 # print(k,loss)
                 # 2. compute grad on theta_pi
                 
@@ -329,7 +329,7 @@ class Meta(nn.Module):
                 u_state = [u.detach().clone().requires_grad_() for u in u_state]
 
             logits_q = self.net(x_qry[i], u_state, bn_training=True)
-            loss_q = F.mse_loss(logits_q, y_qry[i]); losses_q[1] += loss_q.detach().clone()
+            loss_q = F.mse_loss(logits_q, y_qry[i])/querysz; losses_q[1] += loss_q.detach().clone()
             grad_q = torch.autograd.grad(loss_q, u_state)
             
             grad = torch.autograd.grad(fast_weights, self.net.parameters(), grad_outputs=grad_q)
@@ -389,7 +389,7 @@ class Meta(nn.Module):
         with torch.no_grad():
             # [setsz, nway]
             logits_q = net(x_qry, net.parameters(), bn_training=True)
-            loss_q = F.mse_loss(logits_q, y_qry)
+            loss_q = F.mse_loss(logits_q, y_qry)/querysz
             losses_q[0] += loss_q
             # [setsz]
 
@@ -397,14 +397,14 @@ class Meta(nn.Module):
         with torch.no_grad():
             # [setsz, nway]
             logits_q = net(x_qry, fast_weights, bn_training=True)
-            loss_q = F.mse_loss(logits_q, y_qry)
+            loss_q = F.mse_loss(logits_q, y_qry)/querysz
             losses_q[1] += loss_q
             # [setsz]
 
         for k in range(1, self.update_step_test):
             # 1. run the i-th task and compute loss for k=1~K-1
             logits = net(x_spt, fast_weights, bn_training=True)
-            loss = F.mse_loss(logits, y_spt)
+            loss = F.mse_loss(logits, y_spt)/x_spt.size(0)
             # 2. compute grad on theta_pi
             grad = torch.autograd.grad(loss, fast_weights)
             # 3. theta_pi = theta_pi - train_lr * grad
@@ -412,7 +412,7 @@ class Meta(nn.Module):
 
             logits_q = net(x_qry, fast_weights, bn_training=True)
             # loss_q will be overwritten and just keep the loss_q on last update step.
-            loss_q = F.mse_loss(logits_q, y_qry)
+            loss_q = F.mse_loss(logits_q, y_qry)/querysz
             losses_q[k + 1] += loss_q
 
 
