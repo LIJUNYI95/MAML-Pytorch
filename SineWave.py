@@ -33,7 +33,7 @@ class SineWave(object):
 
         self.k_shot = k_shot
 
-        self.k_qry = 15
+        self.k_qry = 1
 
         self.batchsz = batchsz
     
