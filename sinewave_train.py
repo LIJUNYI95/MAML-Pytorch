@@ -85,8 +85,10 @@ def main(args):
         if args.dimi_m_coef: maml.m_coef =  max(1/(step // 5000 + 1) ** 0.5, 0.7)
         if step < 5000: 
             maml.m_coef = 1
+            maml.update_lr = args.update_lr / 10
         else:
             maml.m_coef = args.m_coef
+            maml.update_lr = args.update_lr
         losses = maml(x_spt, y_spt, x_qry, y_qry)
         train_loss.append(losses[-1])
 
