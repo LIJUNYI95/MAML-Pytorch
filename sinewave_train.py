@@ -84,9 +84,9 @@ def main(args):
         # set traning=True to update running_mean, running_variance, bn_weights, bn_bias
         if args.dimi_m_coef: maml.m_coef =  max(1/(step // 5000 + 1) ** 0.5, 0.7)
         if step < 5000: 
-            maml.update_lr = args.update_lr / 2
+            maml.m_coef = 1
         else:
-            maml.update_lr = args.update_lr
+            maml.m_coef = args.m_coef
         losses = maml(x_spt, y_spt, x_qry, y_qry)
         train_loss.append(losses[-1])
 
