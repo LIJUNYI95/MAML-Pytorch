@@ -40,6 +40,7 @@ class Meta(nn.Module):
             self.meta_optim = optim.SGD(self.net.parameters(), lr=self.meta_lr)
         elif self.opt == 'momentum':
             self.meta_optim = optim.SGD(self.net.parameters(), lr=self.meta_lr, momentum=self.mu)
+            print('I am useing mo')
         else:
             self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
     def clip_grad_by_norm_(self, grad, max_norm):
