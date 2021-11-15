@@ -35,4 +35,5 @@ conda activate $PROJECT/pytorch
 # python omniglot_train.py --n_way 20 --k_spt 5 --m_coef 1 --update_step 1 --update_step_test 5 --task_num 1 --opt momentum --mu 0.9 --restore
 # python omniglot_train.py --n_way 5 --k_spt 5 --m_coef 1 --update_step 1 --update_step_test 5 --task_num 1 --opt momentum --mu 0.9 --restore
 # python omniglot_train.py --n_way 5 --k_spt 5 --m_coef 0.7 --update_step 1 --update_step_test 5 --task_num 1 --opt momentum --mu 0.9 --restore
-python omniglot_train.py --n_way 20 --k_spt 1 --m_coef 0.7 --update_step 1 --update_step_test 5 --task_num 1 --opt momentum --mu 0.9 --k_qry 18 --restore
+# python omniglot_train.py --n_way 20 --k_spt 1 --m_coef 0.7 --update_step 1 --update_step_test 5 --task_num 1 --opt momentum --mu 0.9 --k_qry 18 --restore
+python omniglot_train.py --n_way 20 --k_spt 1 --m_coef 1 --update_step 1 --update_step_test 5 --task_num 1 --opt momentum --mu 0.9 --k_qry 18 --restore
