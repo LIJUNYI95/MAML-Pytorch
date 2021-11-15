@@ -42,8 +42,9 @@ class SineWave(object):
         data_x = np.zeros((self.batchsz, self.k_shot + self.k_qry,1))
         data_y = np.zeros((self.batchsz, self.k_shot + self.k_qry,1))
         for i in range(self.batchsz):
-            A = np.random.randint(1, high=6)
-            Phi = np.random.randint(1, high=6)
+            # A = np.random.randint(1, high=6)
+            # Phi = np.random.randint(1, high=6)
+            A = 1; Phi = 1
 
             data_x[i] = np.random.uniform(low=-5, high=5, size=self.k_shot + self.k_qry).reshape(1,-1,1)
             data_y[i] = A * np.sin(data_x[i] + Phi * np.pi/5)
