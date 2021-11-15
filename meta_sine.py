@@ -381,7 +381,7 @@ class Meta(nn.Module):
 
         # 1. run the i-th task and compute loss for k=0
         logits = net(x_spt)
-        loss = F.mse_loss(logits, y_spt)
+        loss = F.mse_loss(logits, y_spt)/x_spt.zie(0)
         grad = torch.autograd.grad(loss, net.parameters())
         fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, net.parameters())))
 
