@@ -301,7 +301,7 @@ class Meta(nn.Module):
 
 
             fast_weights = list(map(lambda p: p, self.net.parameters()))
-            pdb.set_trace()
+            # pdb.set_trace()
             for k in range(self.update_step):
                 # 1. run the i-th task and compute loss for k=1~K-1
                 logits = self.net(x_spt[i], fast_weights, bn_training=True)
@@ -320,7 +320,7 @@ class Meta(nn.Module):
 
             
             # tmp_weights = [tmp_w + fast_w/task_num for tmp_w, fast_w in zip(tmp_weights, fast_weights)]
-            pdb.set_trace()
+            # pdb.set_trace()
             if self.momentum_weight is None:
                 u_state = [u.detach().clone().requires_grad_() for u in fast_weights]
             else:
