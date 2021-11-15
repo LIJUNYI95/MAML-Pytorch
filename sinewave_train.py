@@ -83,7 +83,7 @@ def main(args):
 
         # set traning=True to update running_mean, running_variance, bn_weights, bn_bias
         if args.dimi_m_coef: maml.m_coef =  max(1/(step // 5000 + 1) ** 0.5, 0.7)
-        if step < 1000: 
+        if step < 50000: 
             maml.m_coef = 1
             # maml.update_lr = args.update_lr / 2
         else:
