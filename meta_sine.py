@@ -331,7 +331,9 @@ class Meta(nn.Module):
             logits_q = self.net(x_qry[i], u_state, bn_training=True)
             loss_q = F.mse_loss(logits_q, y_qry[i]); losses_q[1] += loss_q.detach().clone()
             grad_q = torch.autograd.grad(loss_q, u_state)
-            tmp_grad = [tmp_g + fast_g/task_num for tmp_g, fast_g in zip(tmp_grad, grad_q)]
+
+            grad = torch.autograd.grad(fast_weights, self.net.parameters(), grad_outputs=grad_q)
+            tmp_grad = [tmp_g + fast_g/task_num for tmp_g, fast_g in zip(tmp_grad, grad)]
 
             tmp_state = [tmp_st + state_cur/task_num for tmp_st, state_cur in zip(tmp_state, u_state)]
 
