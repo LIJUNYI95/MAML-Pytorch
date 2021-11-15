@@ -68,7 +68,7 @@ def main(args):
     step = len(train_loss)
     while True:
         # for batch in db_train.dataloader:
-        batch = db_train.gen_one_task()
+        batch = db_train.gen_one_test_task()
         train_size= args.k_spt
         # pdb.set_trace()
         x_val, y_val = batch[0].float(), batch[1].float()
