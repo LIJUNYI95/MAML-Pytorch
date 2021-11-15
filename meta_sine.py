@@ -301,7 +301,7 @@ class Meta(nn.Module):
 
 
             fast_weights = list(map(lambda p: p, self.net.parameters()))
-
+            pdb.set_trace()
             for k in range(self.update_step):
                 # 1. run the i-th task and compute loss for k=1~K-1
                 logits = self.net(x_spt[i], fast_weights, bn_training=True)
