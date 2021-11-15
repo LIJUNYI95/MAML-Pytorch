@@ -82,7 +82,7 @@ def main(args):
                                     x_qry.to(device), y_qry.to(device)
 
         # set traning=True to update running_mean, running_variance, bn_weights, bn_bias
-        if args.dimi_m_coef: maml.m_coef =  max(1/(step // 5000 + 1) ** 0.5, 0.2)
+        if args.dimi_m_coef: maml.m_coef =  max(1/(step // 5000 + 1) ** 0.5, 0.7)
         losses = maml(x_spt, y_spt, x_qry, y_qry)
         train_loss.append(losses[-1])
 
