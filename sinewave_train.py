@@ -32,6 +32,9 @@ def main(args):
     if args.opt == 'momentum':
         info += add_info('mu', args.mu)
 
+    if args.mult_state:
+        info += '_mult_state_'
+
     prefix = result_path + info
     save_path = model_path + info
 
