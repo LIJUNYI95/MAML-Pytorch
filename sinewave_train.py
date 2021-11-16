@@ -89,7 +89,7 @@ def main(args):
         # else:
         #     maml.m_coef = args.m_coef
         #     # maml.update_lr = args.update_lr
-        losses = maml(x_spt, y_spt, x_qry, y_qry, task_num=task_code)
+        losses = maml(x_spt, y_spt, x_qry, y_qry, task_code=task_code)
         train_loss.append(losses[-1])
 
         if step % 50 == 0:
