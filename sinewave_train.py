@@ -57,11 +57,11 @@ def main(args):
     print(maml)
     print('Total trainable tensors:', num)
     
-    # if args.restore:
-    #     train_loss = list(np.load(prefix +'train_loss.npy'))
-    #     val_loss = list(np.load(prefix +'val_loss.npy'))
-    # else:
-    train_loss = []; val_loss = []
+    if args.restore:
+        train_loss = list(np.load(prefix +'train_loss.npy'))
+        val_loss = list(np.load(prefix +'val_loss.npy'))
+    else:
+        train_loss = []; val_loss = []
 
 
     db_train = SineWave('SineWave',
