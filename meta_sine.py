@@ -288,7 +288,7 @@ class Meta(nn.Module):
         # pdb.set_trace()
         task_num, setsz, _ = x_spt.size()
         querysz = x_qry.size(1)
-        assert task_code <= 24
+        assert np.max(task_code) <= 24
         losses_q = [0 for _ in range(2)]  # losses_q[i] is the loss on step i
 
 
