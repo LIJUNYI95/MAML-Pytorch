@@ -428,6 +428,8 @@ class Meta(nn.Module):
             losses_q[1] += loss_q
             # [setsz]
 
+        best_loss = 1e8
+        best_logits = None
         for k in range(1, self.update_step_test):
             # 1. run the i-th task and compute loss for k=1~K-1
             logits = net(x_spt, fast_weights, bn_training=True)
@@ -440,6 +442,9 @@ class Meta(nn.Module):
             logits_q = net(x_qry, fast_weights, bn_training=True)
             # loss_q will be overwritten and just keep the loss_q on last update step.
             loss_q = F.mse_loss(logits_q, y_qry)/querysz
+            if loss_q < best_loss:
+                best_loss = loss_q
+                best_logits = logits_q
             losses_q[k + 1] += loss_q
 
 
@@ -448,7 +453,7 @@ class Meta(nn.Module):
         losses = np.array([l.data.cpu().numpy().item() for l in losses_q])
 
         if useLogits:
-            return logits_q
+            return best_logits
         else:
             return losses
 
