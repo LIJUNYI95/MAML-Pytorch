@@ -82,7 +82,7 @@ def main(args):
             for x_spt_one, y_spt_one, x_qry_one, y_qry_one in zip(x_spt, y_spt, x_qry, y_qry):
                 logits = maml.finetunning(x_spt_one, y_spt_one, x_qry_one, y_qry_one, useLogits=True)
             
-            save_data = np.concat([x_qry.data.cpu().numpy, y_qry.data.cpu().numpy, logits.data.cpu().numpy])
+            save_data = np.concatenate([x_qry.data.cpu().numpy, y_qry.data.cpu().numpy, logits.data.cpu().numpy])
             np.save(prefix +'final_predict.npy', save_data)
             break
 
