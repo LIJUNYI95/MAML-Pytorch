@@ -168,7 +168,7 @@ if __name__ == '__main__':
     argparser.add_argument('--dimi_m_coef', dest='dimi_m_coef', action='store_true')
     argparser.add_argument('--restore', dest='restore', action='store_true')
     argparser.add_argument('--mult_state', dest='mult_state', action='store_true')
-
+    argparser.add_argument('--test_mode', dest='test_mode', action='store_true')
 
     args = argparser.parse_args()
 
