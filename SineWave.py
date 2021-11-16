@@ -63,3 +63,13 @@ class SineWave(object):
         y = A * np.sin(x + Phi * np.pi/5)
 
         return torch.tensor(x).cuda(), torch.tensor(y).cuda()
+
+    def gen_one_test_task_large(self):
+
+        A = np.random.uniform(low = 1, high=5)
+        Phi = np.random.uniform(low = 1, high=5)
+
+        x = np.random.uniform(low=-5, high=5, size=2000).reshape(1,-1,1)
+        y = A * np.sin(x + Phi * np.pi/5)
+
+        return torch.tensor(x).cuda(), torch.tensor(y).cuda()

@@ -70,6 +70,22 @@ def main(args):
 
     step = len(train_loss)
     while True:
+        if args.test_mode:
+            test_batch = db_train.gen_one_test_task_large()
+            train_size= args.k_spt
+            x_val, y_val = test_batch[0].float(), test_batch[1].float()
+            x_spt, y_spt = x_val[:,:train_size,:], y_val[:,:train_size,:]
+            x_qry, y_qry = x_val[:,train_size:,:], y_val[:,train_size:,:]
+            x_spt, y_spt, x_qry, y_qry = x_spt.to(device), y_spt.to(device), x_qry.to(device), y_qry.to(device)
+
+            # split to single task each time
+            for x_spt_one, y_spt_one, x_qry_one, y_qry_one in zip(x_spt, y_spt, x_qry, y_qry):
+                logits = maml.finetunning(x_spt_one, y_spt_one, x_qry_one, y_qry_one, useLogits=True)
+            
+            save_data = np.concat([x_qry.data.cpu().numpy, y_qry.data.cpu().numpy, logits.data.cpu().numpy])
+            np.save(prefix +'final_predict.npy', save_data)
+            break
+
         # for batch in db_train.dataloader:
         batch, task_code = db_train.gen_one_task()
         train_size= args.k_spt

@@ -388,7 +388,7 @@ class Meta(nn.Module):
         return losses
 
 
-    def finetunning(self, x_spt, y_spt, x_qry, y_qry):
+    def finetunning(self, x_spt, y_spt, x_qry, y_qry, useLogits=False):
         """
 
         :param x_spt:   [setsz, c_, h, w]
@@ -447,7 +447,10 @@ class Meta(nn.Module):
 
         losses = np.array([l.data.cpu().numpy().item() for l in losses_q])
 
-        return losses
+        if useLogits:
+            return logits_q
+        else:
+            return losses
 
 
 
