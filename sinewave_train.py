@@ -81,7 +81,7 @@ def main(args):
             # split to single task each time
             for x_spt_one, y_spt_one, x_qry_one, y_qry_one in zip(x_spt, y_spt, x_qry, y_qry):
                 logits = maml.finetunning(x_spt_one, y_spt_one, x_qry_one, y_qry_one, useLogits=True)
-            pdb.set_trace()
+            # pdb.set_trace()
             save_data = np.concatenate([x_qry.data.cpu().numpy(), y_qry.data.cpu().numpy(), np.expand_dims(logits.data.cpu().numpy(),0)])
             np.save(prefix +'final_predict.npy', save_data)
             break
