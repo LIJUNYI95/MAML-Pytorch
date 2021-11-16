@@ -295,7 +295,7 @@ class Meta(nn.Module):
         # this is the loss and accuracy before first update
         # tmp_weights = [torch.zeros_like(p) for p in self.net.parameters()]
         if self.mult_state:
-            tmp_state = [torch.zeros_like(p) for p in self.net.parameters()] * 25
+            tmp_state = [[torch.zeros_like(p) for p in self.net.parameters()] ]* 25
             tmp_count = [0]*25
         else:
             tmp_state = [torch.zeros_like(p) for p in self.net.parameters()]
