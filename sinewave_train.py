@@ -68,7 +68,7 @@ def main(args):
     step = len(train_loss)
     while True:
         # for batch in db_train.dataloader:
-        batch = db_train.gen_one_task()
+        batch, task_code = db_train.gen_one_task()
         train_size= args.k_spt
         # pdb.set_trace()
         x_val, y_val = batch[0].float(), batch[1].float()
@@ -89,7 +89,7 @@ def main(args):
         # else:
         #     maml.m_coef = args.m_coef
         #     # maml.update_lr = args.update_lr
-        losses = maml(x_spt, y_spt, x_qry, y_qry)
+        losses = maml(x_spt, y_spt, x_qry, y_qry, task_num=task_code)
         train_loss.append(losses[-1])
 
         if step % 50 == 0:
@@ -148,6 +148,7 @@ if __name__ == '__main__':
     argparser.add_argument('--update_step_test', type=int, help='update steps for finetunning', default=5)
     argparser.add_argument('--dimi_m_coef', dest='dimi_m_coef', action='store_true')
     argparser.add_argument('--restore', dest='restore', action='store_true')
+    argparser.add_argument('--mult_state', dest='mult_state', action='store_true')
 
 
     args = argparser.parse_args()

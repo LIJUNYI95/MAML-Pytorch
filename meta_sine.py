@@ -237,10 +237,14 @@ class Meta(nn.Module):
         self.update_step = args.update_step
         self.update_step_test = args.update_step_test
         self.opt = args.opt
+        self.mult_state = args.mult_state
 
 
         self.net = Learner(config)
-        self.momentum_weight = None
+        if self.mult_state:
+            self.momentum_weight = [None] * 25
+        else:
+            self.momentum_weight = None
         if self.opt ==  'sgd':
             self.meta_optim = optim.SGD(self.net.parameters(), lr=self.meta_lr)
         elif self.opt == 'momentum':
@@ -272,7 +276,7 @@ class Meta(nn.Module):
         return total_norm/counter
 
 
-    def forward(self, x_spt, y_spt, x_qry, y_qry):
+    def forward(self, x_spt, y_spt, x_qry, y_qry, task_code=None):
         """
 
         :param x_spt:   [b, setsz, c_, h, w]
@@ -284,13 +288,18 @@ class Meta(nn.Module):
         # pdb.set_trace()
         task_num, setsz, _ = x_spt.size()
         querysz = x_qry.size(1)
-
+        assert task_code <= 24
         losses_q = [0 for _ in range(2)]  # losses_q[i] is the loss on step i
 
 
         # this is the loss and accuracy before first update
         # tmp_weights = [torch.zeros_like(p) for p in self.net.parameters()]
-        tmp_state = [torch.zeros_like(p) for p in self.net.parameters()]
+        if self.mult_state:
+            tmp_state = [torch.zeros_like(p) for p in self.net.parameters()] * 25
+            tmp_count = [0]*25
+        else:
+            tmp_state = [torch.zeros_like(p) for p in self.net.parameters()]
+
         tmp_grad = [torch.zeros_like(p) for p in self.net.parameters()]
         for i in range(task_num):
             with torch.no_grad():
@@ -321,22 +330,34 @@ class Meta(nn.Module):
             
             # tmp_weights = [tmp_w + fast_w/task_num for tmp_w, fast_w in zip(tmp_weights, fast_weights)]
             # pdb.set_trace()
-            if self.momentum_weight is None:
-                u_state = [u.detach().clone().requires_grad_() for u in fast_weights]
+            if self.mult_state:
+                if self.momentum_weight[task_code[i]] is None:
+                    u_state = [u.detach().clone().requires_grad_() for u in fast_weights]
+                else:
+                    u_state = list(map(lambda p: (1 - self.m_coef) * p[0] + self.m_coef * p[1].detach().clone(), \
+                        zip(self.momentum_weight[task_code[i]], fast_weights)))
+                    u_state = [u.detach().clone().requires_grad_() for u in u_state]
             else:
-                u_state = list(map(lambda p: (1 - self.m_coef) * p[0] + self.m_coef * p[1].detach().clone(), \
-                    zip(self.momentum_weight, fast_weights)))
-                u_state = [u.detach().clone().requires_grad_() for u in u_state]
+                if self.momentum_weight is None:
+                    u_state = [u.detach().clone().requires_grad_() for u in fast_weights]
+                else:
+                    u_state = list(map(lambda p: (1 - self.m_coef) * p[0] + self.m_coef * p[1].detach().clone(), \
+                        zip(self.momentum_weight, fast_weights)))
+                    u_state = [u.detach().clone().requires_grad_() for u in u_state]
 
             logits_q = self.net(x_qry[i], u_state, bn_training=True)
             loss_q = F.mse_loss(logits_q, y_qry[i])/querysz; losses_q[1] += loss_q.detach().clone()
             grad_q = torch.autograd.grad(loss_q, u_state)
             
             grad = torch.autograd.grad(fast_weights, self.net.parameters(), grad_outputs=grad_q)
-            # print(grad[-1], grad_q[-1])
+
             tmp_grad = [tmp_g + fast_g/task_num for tmp_g, fast_g in zip(tmp_grad, grad)]
 
-            tmp_state = [tmp_st + state_cur/task_num for tmp_st, state_cur in zip(tmp_state, u_state)]
+            if self.mult_state:
+                tmp_state[task_code[i]] = [tmp_st + state_cur for tmp_st, state_cur in zip(tmp_state[task_code[i]], u_state)]
+                tmp_count[task_code[i]] += 1
+            else:
+                tmp_state = [tmp_st + state_cur/task_num for tmp_st, state_cur in zip(tmp_state, u_state)]
 
         # tmp_grad = [torch.zeros_like(p) for p in self.net.parameters()]
         # for i in range(task_num):
@@ -350,7 +371,13 @@ class Meta(nn.Module):
         # grad = torch.autograd.grad(tmp_weights, self.net.parameters(), grad_outputs=tmp_grad)
         # optimize theta parameters
         # print(grad[-1])
-        self.momentum_weight = [u.detach().clone() for u in tmp_state]
+        # self.momentum_weight = [u.detach().clone() for u in tmp_state]
+        if self.mult_state:
+            for code in task_code:
+                self.momentum_weight[code] = [u.detach().clone()/tmp_count[code] for u in tmp_state[code]]
+        else:
+            self.momentum_weight = [u.detach().clone() for u in tmp_state]
+        
         self.meta_optim.zero_grad()
         for p, g in zip(self.net.parameters(), tmp_grad):
             p.grad = g.clone()
