@@ -34,6 +34,9 @@ def main(args):
 
     if args.mult_state:
         info += '_mult_state_'
+    
+    if args.use_spider:
+        info += '_BSpiderBoost_'
 
     prefix = result_path + info
     save_path = model_path + info
