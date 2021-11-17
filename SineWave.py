@@ -61,7 +61,7 @@ class SineWave(object):
 
         task_code = []
         for i in range(5):
-            for j in range(5)
+            for j in range(5):
                 A = i
                 Phi = j
                 task_code.append((A  - 1) * 5 + (Phi - 1))
