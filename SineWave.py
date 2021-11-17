@@ -54,6 +54,23 @@ class SineWave(object):
 
         return (torch.tensor(data_x).cuda(), torch.tensor(data_y).cuda()), task_code
 
+    def gen_all_tasks(self):
+
+        data_x = np.zeros((25, self.k_shot + self.k_qry,1))
+        data_y = np.zeros((25, self.k_shot + self.k_qry,1))
+
+        task_code = []
+        for i in range(5):
+            for j in range(5)
+                A = i
+                Phi = j
+                task_code.append((A  - 1) * 5 + (Phi - 1))
+
+                data_x[i] = np.random.uniform(low=-5, high=5, size=self.k_shot + self.k_qry).reshape(1,-1,1)
+                data_y[i] = A * np.sin(data_x[i] + Phi * np.pi/5)
+
+            return (torch.tensor(data_x).cuda(), torch.tensor(data_y).cuda()), task_code
+
     def gen_one_test_task(self):
 
         A = np.random.uniform(low = 1, high=5)
